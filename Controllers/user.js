@@ -2,10 +2,11 @@ import bcrypt, { compare } from "bcrypt";
 import passport from "passport";
 import { TryCatch } from "../Middlewares/error.js";
 import { User } from "../Models/user.js";
-import { cookieOptions, sendToken } from "../Utils/features.js";
+import { cookieOptions, sendToken, uploadFilesToCloudinary } from "../Utils/features.js";
 import ErrorHandler from "../Utils/utility.js";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
+import { v2 as cloudinary } from 'cloudinary'
 
 const newUser = TryCatch(async (req, res, next) => {
   const { email, name, password } = req.body;
@@ -13,64 +14,18 @@ const newUser = TryCatch(async (req, res, next) => {
   if (!email || !name || !password)
     return next(new ErrorHandler("All Feilds Are Required", 404));
 
-  const verificationToken = crypto.randomBytes(16).toString("hex");
 
   const user = await User.create({
     email,
     name,
     password,
-    verificationToken,
-  });
-
-  const verificationLink = `${process.env.CLIENT_URL}/verify-email?token=${verificationToken}`;
-
-  const transporter = nodemailer.createTransport({
-    service: "Gmail",
-    auth: {
-      user: process.env.MAIL,
-      pass: process.env.PASS,
-    },
-  });
-
-  const mailOptions = {
-    from: process.env.MAIL,
-    to: email,
-    subject: "Email Verification",
-    text: `Please verify your email by clicking on the following link.`,
-    html: `<!DOCTYPE html>
-<html>
-<head>
-  <style>
-  a{
-  padding:10px 20px;
-  background-color:white;
-  color:blue;
-  border-radius:6px;
-  font-weight:bold;
-  }
-  </style>
-</head>
-<body>
-  <h1>Please verify your email by clicking on the following link</h1>
-  <a href=${verificationLink}>
-  Verify Email
-  </a>
-</body>
-</html>`,
-  };
-
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.log("Error sending mail. Please try again.");
-    }
-    console.log("Mail sent successfully!");
   });
 
   sendToken(
     res,
     user,
     200,
-    `Verification email sent. Please check your email.`
+    `User registration successful`
   );
 });
 
@@ -171,7 +126,7 @@ const myProfile = TryCatch(async (req, res, next) => {
 const logout = TryCatch(async (req, res, next) => {
   return res
     .status(200)
-    .cookie("logoMaker-token", "", { ...cookieOptions, maxAge: 0 })
+    .cookie("themecraft-token", "", { ...cookieOptions, maxAge: 0 })
     .json({
       success: true,
       message: "Logged out successfully",
@@ -183,12 +138,8 @@ const googleLogin = TryCatch(async (req, res, next) => {
 });
 
 const editProfile = TryCatch(async (req, res, next) => {
-  const { name, profile } = req.body;
-  const updatedData = {
-    name,
-    profile,
-  };
-  const user = await User.findByIdAndUpdate(req.user, updatedData);
+
+  const user = await User.findByIdAndUpdate(req.user, req.body);
   if (!req.user) return next(new ErrorHandler("No Account Found!", 404));
 
   await user.save();
@@ -224,6 +175,29 @@ const getOtp = TryCatch(async (req, res, next) => {
   });
 });
 
+const uploadProfile = TryCatch(async (req, res, next) => {
+  const image = req.file;
+  const user = await User.findById(req.user);
+  if (!image) return next(new ErrorHandler("Please select an image", 400));
+
+  if (user?.profile?.public_id) {
+    await cloudinary.uploader.destroy(user.profile.public_id);
+  }
+
+  const result = await uploadFilesToCloudinary([image]);
+  const profile = {
+    url: result[0].url,
+    public_id: result[0].public_id
+  }
+  user.profile = profile
+
+  await user.save();
+  return res.status(200).json({
+    success: true,
+    message: "Profile Pic Updated",
+  });
+})
+
 const deleteAccount = TryCatch(async (req, res, next) => {
   const user = await User.findById(req.user);
 
@@ -246,5 +220,5 @@ export {
   emailVerify,
   getOtp,
   deleteAccount,
-  resendEmail,
+  resendEmail, uploadProfile
 };

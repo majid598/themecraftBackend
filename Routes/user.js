@@ -11,8 +11,10 @@ import {
   newUser,
   resendEmail,
   resetPassword,
+  uploadProfile,
 } from "../Controllers/user.js";
 import { isAuthenticated } from "../Middlewares/auth.js";
+import { singleAvatar } from '../Middlewares/multer.js'
 const router = express.Router();
 
 router.post("/new", newUser);
@@ -39,6 +41,8 @@ router.get(
 router.get("/logout", isAuthenticated, logout);
 
 router.get("/me", isAuthenticated, myProfile);
+
+router.put("/upload/profile", isAuthenticated, singleAvatar, uploadProfile);
 
 router.post("/resend-email", isAuthenticated, resendEmail);
 

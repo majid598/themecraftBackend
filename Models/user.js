@@ -22,21 +22,30 @@ const schema = mongoose.Schema(
       required: true,
       select: false,
     },
-    profile: String,
-    isSubscribed: {
-      type: Boolean,
-      default: false,
-    },
-    subscribedPlan: {
-      type: String,
+    profile: {
+      url: String,
+      public_id: String
     },
     verificationToken: { type: String },
-    verified: { type: Boolean, default: false },
-    logos: [
+    verified: {
+      type: Boolean,
+      default: false
+    },
+    selectedLeng: {
+      type: String,
+      enum: ["English", "urdu"],
+      default: "English"
+    },
+    role: {
+      type: String,
+      enum: ["seller", "user"],
+      default: "user"
+    },
+    items: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Logo",
-      },
+        ref: "Item"
+      }
     ],
     googleId: String,
   },

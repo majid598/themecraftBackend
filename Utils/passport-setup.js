@@ -10,7 +10,7 @@ export const connectPassport = () => {
       {
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: process.env.CALLBACK_URL,
+        callbackURL: "http://localhost:5000/api/v1/user/google/login",
       },
       async function (accessToken, refreshToken, profile, done) {
         const user = await User.findOne({

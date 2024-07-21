@@ -8,6 +8,7 @@ import { connectDb } from "./Utils/db.js";
 import Stripe from "stripe";
 import session from "express-session";
 const app = express();
+import { v2 as cloudinary } from 'cloudinary'
 
 dotenv.config({
   path: "./.env",
@@ -57,7 +58,14 @@ app.get("/", (req, res) => {
   res.send("Server Is Working Perfectly");
 });
 
-import logoRoute from "./Routes/Logo.js";
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+
+import itemRoute from "./Routes/Item.js";
 import subscribeRoute from "./Routes/Subscribe.js";
 import userRoute from "./Routes/user.js";
 import { connectPassport } from "./Utils/passport-setup.js";
@@ -65,7 +73,7 @@ import { connectPassport } from "./Utils/passport-setup.js";
 connectDb(process.env.MONGO_URI);
 
 app.use("/api/v1/user", userRoute);
-app.use("/api/v1/logo", logoRoute);
+app.use("/api/v1/item", itemRoute);
 app.use("/api/v1/subscribe", subscribeRoute);
 
 app.use(errorMiddleware);

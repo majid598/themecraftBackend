@@ -41,6 +41,8 @@ const schema = mongoose.Schema(
       enum: ["seller", "user"],
       default: "user"
     },
+    phone: String,
+    about: String,
     items: [
       {
         type: mongoose.Schema.Types.ObjectId,

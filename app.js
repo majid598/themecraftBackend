@@ -1,14 +1,13 @@
-import cookieParser from "cookie-parser";
+import { v2 as cloudinary } from 'cloudinary';
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
+import session from "express-session";
 import passport from "passport";
+import Stripe from "stripe";
 import { errorMiddleware } from "./Middlewares/error.js";
 import { connectDb } from "./Utils/db.js";
-import Stripe from "stripe";
-import session from "express-session";
 const app = express();
-import { v2 as cloudinary } from 'cloudinary'
 
 dotenv.config({
   path: "./.env",
@@ -50,9 +49,7 @@ app.enable("trust proxy");
 
 export const stripe = new Stripe(process.env.STRIPE_KEY)
 
-connectPassport();
-
-app.use(cookieParser());
+// connectPassport();
 
 app.get("/", (req, res) => {
   res.send("Server Is Working Perfectly");

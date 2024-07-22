@@ -25,18 +25,18 @@ router.get("/verify-email", emailVerify);
 
 router.get("/otp", getOtp);
 
-router.get(
-  "/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
-);
+// router.get(
+//   "/google",
+//   passport.authenticate("google", { scope: ["profile", "email"] })
+// );
 
-router.get(
-  "/google/login",
-  passport.authenticate("google", { failureRedirect: "/api/v1/user/google" }),
-  (req, res) => {
-    res.redirect(process.env.CLIENT_URL);
-  }
-);
+// router.get(
+//   "/google/login",
+//   passport.authenticate("google", { failureRedirect: "/api/v1/user/google" }),
+//   (req, res) => {
+//     res.redirect(process.env.CLIENT_URL);
+//   }
+// );
 
 router.get("/logout", isAuthenticated, logout);
 

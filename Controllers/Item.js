@@ -75,7 +75,18 @@ const allItems = TryCatch(async (req, res, next) => {
     });
   }
   const items = await Item.find({ category })
-  
+
+  return res.status(200).json({
+    success: true,
+    items,
+  });
+});
+
+const searchItems = TryCatch(async (req, res, next) => {
+  const { query } = req.query
+
+  const items = await Item.find({ name: new RegExp(query, 'i') })
+
   return res.status(200).json({
     success: true,
     items,
@@ -83,7 +94,7 @@ const allItems = TryCatch(async (req, res, next) => {
 });
 
 const getItemById = TryCatch(async (req, res, next) => {
-  const item = await Item.findById(req.params.id).populate("seller","name");
+  const item = await Item.findById(req.params.id).populate("seller", "name");
 
   return res.status(200).json({
     success: true,
@@ -138,4 +149,4 @@ const editLogo = TryCatch(async (req, res, next) => {
   });
 });
 
-export { newItem, myItems, deleteLogo, editLogo, latestItems, allItems, getItemById };
+export { newItem, myItems, deleteLogo, editLogo, latestItems, allItems, getItemById, searchItems };

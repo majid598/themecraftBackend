@@ -127,7 +127,7 @@ const myProfile = TryCatch(async (req, res, next) => {
 const logout = TryCatch(async (req, res, next) => {
   return res
     .status(200)
-    .cookie("themecraft-token", "", { ...cookieOptions, maxAge: 0 })
+    .cookie("themeCraft-token", "", { ...cookieOptions, maxAge: 0 })
     .json({
       success: true,
       message: "Logged out successfully",

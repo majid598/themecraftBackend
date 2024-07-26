@@ -39,6 +39,8 @@ app.use(
   })
 );
 
+app.use(cookieParser())
+
 app.use(express.json());
 
 app.use(passport.authenticate("session"));
@@ -65,6 +67,7 @@ import itemRoute from "./Routes/Item.js";
 import subscribeRoute from "./Routes/Subscribe.js";
 import userRoute from "./Routes/user.js";
 import { connectPassport } from "./Utils/passport-setup.js";
+import cookieParser from 'cookie-parser';
 
 connectDb(process.env.MONGO_URI);
 

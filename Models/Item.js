@@ -12,7 +12,7 @@ const schema = mongoose.Schema(
     },
     image: {
       id: Number,
-      type: String,
+      imageType: String,
     },
     desc1: String,
     desc2: String,

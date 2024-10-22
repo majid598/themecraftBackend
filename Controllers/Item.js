@@ -89,7 +89,7 @@ const searchItems = TryCatch(async (req, res, next) => {
 });
 
 const getItemById = TryCatch(async (req, res, next) => {
-  const item = await Item.findById(req.params.id).populate("seller", "name");
+  const item = await Item.findById(req.params.id);
 
   return res.status(200).json({
     success: true,

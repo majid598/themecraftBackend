@@ -19,8 +19,6 @@ const newItem = TryCatch(async (req, res, next) => {
     category,
   } = req.body;
 
-  console.log(images);
-
   if (!name || !title || !domain || !desc1 || !category || !features)
     return next(new ErrorHandler("all fields are required", 400));
 

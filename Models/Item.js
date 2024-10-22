@@ -2,47 +2,30 @@ import mongoose, { model } from "mongoose";
 
 const schema = mongoose.Schema(
   {
-    seller: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-    },
     name: {
       type: String,
       required: true,
-
     },
-    category: {
+    title: {
       type: String,
       required: true,
     },
-    domain: {
+    image: {
+      id: Number,
       type: String,
-      required: true,
     },
-    price: {
+    desc1: String,
+    desc2: String,
+    features: [String],
+    inTheBox: [String],
+    lbPlg: [String],
+    zipFile: String,
+    domain: String,
+    category: String,
+    downloads: {
       type: Number,
-      required: true
+      default: 0,
     },
-    description: {
-      type: String,
-      required: true,
-    },
-    images: [
-      {
-        _id: false,
-        public_id: String,
-        url: String,
-      }
-    ],
-    languages: {
-      type: String,
-      required: true
-    },
-    zip: {
-      url: String,
-      public_id: String
-    },
-    buyerId: String,
   },
   {
     timestamps: true,

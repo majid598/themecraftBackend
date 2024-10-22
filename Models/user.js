@@ -1,5 +1,5 @@
 import { hash } from "bcrypt";
-import mongoose, { model } from "mongoose";
+import mongoose, { model, Types } from "mongoose";
 import validator from "validator";
 
 const schema = mongoose.Schema(
@@ -24,32 +24,23 @@ const schema = mongoose.Schema(
     },
     profile: {
       url: String,
-      public_id: String
+      public_id: String,
     },
     verificationToken: { type: String },
     verified: {
       type: Boolean,
-      default: false
+      default: false,
     },
     selectedLeng: {
       type: String,
       enum: ["English", "urdu"],
-      default: "English"
-    },
-    role: {
-      type: String,
-      enum: ["seller", "user"],
-      default: "user"
+      default: "English",
     },
     phone: String,
     about: String,
-    items: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Item"
-      }
-    ],
     googleId: String,
+    downloads: [{ type: Types.ObjectId, ref: "Item" }],
+    favorites: [{ type: Types.ObjectId, ref: "Item" }],
   },
   {
     timestamps: true,

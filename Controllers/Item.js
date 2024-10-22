@@ -1,45 +1,42 @@
 import { TryCatch } from "../Middlewares/error.js";
 import { Item } from "../Models/Item.js";
 import { User } from "../Models/user.js";
-import { uploadFilesToCloudinary } from "../Utils/features.js";
 import ErrorHandler from "../Utils/utility.js";
 
 const newItem = TryCatch(async (req, res, next) => {
   const user = await User.findById(req.user);
   const {
     name,
-    price,
+    title,
+    image,
+    desc1,
+    desc2,
+    features,
+    inTheBox,
+    lbPlg,
+    zipFile,
     domain,
-    description,
     category,
-    languages,
-    zip,
-    images
   } = req.body;
 
-  console.log(images)
+  console.log(images);
 
-  if (!name ||
-    !price ||
-    !domain ||
-    !description ||
-    !category ||
-    !languages) return next(new ErrorHandler("all fields are required", 400))
+  if (!name || !title || !domain || !desc1 || !category || !features)
+    return next(new ErrorHandler("all fields are required", 400));
 
   const item = await Item.create({
-    seller: req.user,
     name,
-    price,
+    title,
+    image,
+    desc1,
+    desc2,
+    features,
+    inTheBox,
+    lbPlg,
+    zipFile,
     domain,
-    description,
     category,
-    languages,
-    zip,
-    images,
   });
-
-  await user.items.push(item);
-  await user.save();
 
   return res.status(200).json({
     success: true,
@@ -66,15 +63,15 @@ const latestItems = TryCatch(async (req, res, next) => {
 });
 
 const allItems = TryCatch(async (req, res, next) => {
-  const { category } = req.query
+  const { category } = req.query;
   if (category === "all") {
-    const items = await Item.find().sort({ createdAt: -1 })
+    const items = await Item.find().sort({ createdAt: -1 });
     return res.status(200).json({
       success: true,
       items,
     });
   }
-  const items = await Item.find({ category })
+  const items = await Item.find({ category });
 
   return res.status(200).json({
     success: true,
@@ -83,9 +80,9 @@ const allItems = TryCatch(async (req, res, next) => {
 });
 
 const searchItems = TryCatch(async (req, res, next) => {
-  const { query } = req.query
+  const { query } = req.query;
 
-  const items = await Item.find({ name: new RegExp(query, 'i') })
+  const items = await Item.find({ name: new RegExp(query, "i") });
 
   return res.status(200).json({
     success: true,
@@ -149,4 +146,8 @@ const editLogo = TryCatch(async (req, res, next) => {
   });
 });
 
-export { newItem, myItems, deleteLogo, editLogo, latestItems, allItems, getItemById, searchItems };
+export {
+  allItems, deleteLogo,
+  editLogo, getItemById, latestItems, myItems, newItem, searchItems
+};
+

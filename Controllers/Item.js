@@ -144,8 +144,21 @@ const editLogo = TryCatch(async (req, res, next) => {
   });
 });
 
-export {
-  allItems, deleteLogo,
-  editLogo, getItemById, latestItems, myItems, newItem, searchItems
-};
+const downloadItem = TryCatch(async (req, res, next) => {
+  await Item.findByIdAndUpdate(req.params.id, { $inc: { downloads: 1 } });
+  return res
+    .status(200)
+    .json({ success: true, message: "Template Downloaded Successfully" });
+});
 
+export {
+  allItems,
+  deleteLogo,
+  editLogo,
+  getItemById,
+  latestItems,
+  myItems,
+  newItem,
+  searchItems,
+  downloadItem,
+};

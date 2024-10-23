@@ -10,6 +10,10 @@ const schema = mongoose.Schema(
       type: String,
       required: true,
     },
+    title2: {
+      type: String,
+      required: true,
+    },
     image: {
       id: Number,
       imageType: String,

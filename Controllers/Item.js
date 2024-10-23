@@ -8,6 +8,7 @@ const newItem = TryCatch(async (req, res, next) => {
   const {
     name,
     title,
+    title2,
     image,
     desc1,
     desc2,
@@ -25,6 +26,7 @@ const newItem = TryCatch(async (req, res, next) => {
   const item = await Item.create({
     name,
     title,
+    title2,
     image,
     desc1,
     desc2,

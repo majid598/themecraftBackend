@@ -147,11 +147,15 @@ const editLogo = TryCatch(async (req, res, next) => {
 });
 
 const downloadItem = TryCatch(async (req, res, next) => {
+  const user = await User.findById(req.user);
   await Item.findByIdAndUpdate(req.params.id, { $inc: { downloads: 1 } });
+  user.downloads.push(req.params.id);
+  await user.save();
   return res
     .status(200)
     .json({ success: true, message: "Template Downloaded Successfully" });
 });
+
 
 export {
   allItems,

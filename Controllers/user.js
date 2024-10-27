@@ -13,6 +13,7 @@ import crypto from "crypto";
 import nodemailer from "nodemailer";
 import { v2 as cloudinary } from "cloudinary";
 import { sendWelcomeEmail, sendVerificationMail } from "../Emails/emails.js";
+import { Item } from "../Models/Item.js";
 
 const signup = TryCatch(async (req, res, next) => {
   const { email, password, name } = req.body;
@@ -231,6 +232,18 @@ const editProfile = TryCatch(async (req, res, next) => {
   });
 });
 
+const userDownloads = TryCatch(async (req, res, next) => {
+  const user = await User.findById(req.user);
+  if (!req.user) return next(new ErrorHandler("No Account Found!", 404));
+  const items = await Item.find({ _id: { $in: user.downloads } });
+
+  await user.save();
+  return res.status(200).json({
+    success: true,
+    items,
+  });
+});
+
 const uploadProfile = TryCatch(async (req, res, next) => {
   const image = req.file;
   const user = await User.findById(req.user);
@@ -276,5 +289,5 @@ export {
   verifyEmail,
   forgotPassword,
   deleteAccount,
-  uploadProfile,
+  uploadProfile,userDownloads
 };

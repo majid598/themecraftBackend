@@ -11,6 +11,7 @@ import {
   signup,
   resetPassword,
   uploadProfile,
+  userDownloads,
 } from "../Controllers/user.js";
 import { isAuthenticated } from "../Middlewares/auth.js";
 import { singleAvatar } from '../Middlewares/multer.js'
@@ -40,6 +41,7 @@ router.post("/verify-email", verifyEmail);
 router.get("/logout", isAuthenticated, logout);
 
 router.get("/me", isAuthenticated, myProfile);
+router.get("/downloads", isAuthenticated, userDownloads);
 
 router.put("/upload/profile", isAuthenticated, singleAvatar, uploadProfile);
 

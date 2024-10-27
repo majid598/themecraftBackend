@@ -12,9 +12,11 @@ import {
   resetPassword,
   uploadProfile,
   userDownloads,
+  subscribeNewsLetter,
+  likeItem,
 } from "../Controllers/user.js";
 import { isAuthenticated } from "../Middlewares/auth.js";
-import { singleAvatar } from '../Middlewares/multer.js'
+import { singleAvatar } from "../Middlewares/multer.js";
 const router = express.Router();
 
 router.post("/signup", signup);
@@ -40,7 +42,12 @@ router.post("/verify-email", verifyEmail);
 
 router.get("/logout", isAuthenticated, logout);
 
+router.post("/subscribe", subscribeNewsLetter);
+
+router.get("/like/:id", isAuthenticated, likeItem);
+
 router.get("/me", isAuthenticated, myProfile);
+
 router.get("/downloads", isAuthenticated, userDownloads);
 
 router.put("/upload/profile", isAuthenticated, singleAvatar, uploadProfile);

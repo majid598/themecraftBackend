@@ -75,6 +75,70 @@ export const VERIFICATION_EMAIL_TEMPLATE = `
 </html>
 
 `;
+export const NEWSLETTER_SUBSCRIPTION_TEMPLATE = `
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome to the Newsletter!</title>
+  </head>
+  <body
+    style="
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: white;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #0b2447;
+    "
+  >
+    <div
+      style="
+        background: linear-gradient(to right, #4caf50, #45a049);
+        padding: 20px;
+        text-align: center;
+        border: 2px solid white;
+        border-top-right-radius: 10px;
+        border-top-left-radius: 10px;
+        border-bottom: none;
+      "
+    >
+      <h1 style="color: white; margin: 0">Welcome to ThemeCraft's Newsletter!</h1>
+    </div>
+    <div
+      style="
+        background-color: rgb(255 255 255 / 0.3);
+        padding: 20px;
+        border-radius: 0 0 10px 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        border: 2px solid white;
+        border-bottom-right-radius: 10px;
+        border-bottom-left-radius: 10px;
+      "
+    >
+      <p style="color: white;">Hello,</p>
+      <p style="color: white;">Thank you for subscribing to our newsletter!</p>
+      <p style="color: white;">You'll now be the first to know about our latest templates, exclusive offers, and design tips to help you build amazing websites.</p>
+      <p style="color: white;">
+        Stay tuned for exciting updates and be on the lookout for your first newsletter coming soon!
+      </p>
+      <p style="color: white;">Best regards,<br /><a href="https://themecraft-net.vercel.app/" target="_blank" style="color: #4caf50; text-decoration: none;">ThemeCraft</a></p>
+    </div>
+    <div
+      style="
+        text-align: center;
+        margin-top: 20px;
+        color: #888;
+        font-size: 0.8em;
+      "
+    >
+      <p>This is an automated message, please do not reply to this email.</p>
+    </div>
+  </body>
+</html>
+`;
 
 export const PASSWORD_RESET_SUCCESS_TEMPLATE = `
 <!DOCTYPE html>

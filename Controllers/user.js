@@ -1,19 +1,21 @@
-import bcrypt, { compare } from "bcrypt";
+import { compare } from "bcrypt";
+import { v2 as cloudinary } from "cloudinary";
+import crypto from "crypto";
 import passport from "passport";
+import {
+  sendSubscriptionEmail,
+  sendVerificationMail,
+  sendWelcomeEmail,
+} from "../Emails/emails.js";
 import { TryCatch } from "../Middlewares/error.js";
-import { User } from "../Models/user.js";
+import { Item } from "../Models/Item.js";
+import { Subscriber, User } from "../Models/user.js";
 import {
   cookieOptions,
   generateTokenAndSetCookie,
-  sendToken,
   uploadFilesToCloudinary,
 } from "../Utils/features.js";
 import ErrorHandler from "../Utils/utility.js";
-import crypto from "crypto";
-import nodemailer from "nodemailer";
-import { v2 as cloudinary } from "cloudinary";
-import { sendWelcomeEmail, sendVerificationMail } from "../Emails/emails.js";
-import { Item } from "../Models/Item.js";
 
 const signup = TryCatch(async (req, res, next) => {
   const { email, password, name } = req.body;
@@ -277,17 +279,66 @@ const deleteAccount = TryCatch(async (req, res, next) => {
     message: "Account Deleted",
   });
 });
+const subscribeNewsLetter = TryCatch(async (req, res, next) => {
+  const { email } = req.body;
 
+  if (!email) {
+    return next(new ErrorHandler("Email is required", 404));
+  }
+
+  const alreadySubs = await Subscriber.findOne({ email });
+  if (alreadySubs)
+    return next(
+      new ErrorHandler("You're Already Subscribed to newsletter", 400)
+    );
+
+  await Subscriber.create({
+    email,
+  });
+
+  // Send verification email
+  sendSubscriptionEmail(email);
+
+  res.status(201).json({
+    success: true,
+    message: "Newsletter Subscribed",
+  });
+});
+
+const likeItem = TryCatch(async (req, res, next) => {
+  const item = await Item.findById(req.params.id);
+  const user = await User.findById(req.user);
+  if (item.likes.indexOf(req.user) === -1) {
+    item.likes.push(req.user);
+    await item.save();
+    return res.status(200).json({
+      success: true,
+      message: "Template Liked",
+      liked: item.likes.includes(user?._id),
+    });
+  }
+  item.likes.splice(item.likes.indexOf(req.user), 1);
+  await item.save();
+
+  return res.status(200).json({
+    success: true,
+    message: "Item unliked",
+    liked: item.likes.includes(user?._id),
+  });
+});
 export {
+  deleteAccount,
   editProfile,
+  forgotPassword,
   googleLogin,
   login,
   logout,
   myProfile,
-  signup,
   resetPassword,
+  signup,
+  subscribeNewsLetter,
+  uploadProfile,
+  userDownloads,
   verifyEmail,
-  forgotPassword,
-  deleteAccount,
-  uploadProfile,userDownloads
+  likeItem,
 };

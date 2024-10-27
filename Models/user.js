@@ -37,17 +37,33 @@ const schema = mongoose.Schema(
     downloads: [{ type: Types.ObjectId, ref: "Item" }],
     favorites: [{ type: Types.ObjectId, ref: "Item" }],
     lastLogin: {
-			type: Date,
-			default: Date.now,
-		},
-		isVerified: {
-			type: Boolean,
-			default: false,
-		},
-		resetPasswordToken: String,
-		resetPasswordExpiresAt: Date,
-		verificationToken: String,
-		verificationTokenExpiresAt: Date,
+      type: Date,
+      default: Date.now,
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    resetPasswordToken: String,
+    resetPasswordExpiresAt: Date,
+    verificationToken: String,
+    verificationTokenExpiresAt: Date,
+  },
+  {
+    timestamps: true,
+  }
+);
+const subscriber = mongoose.Schema(
+  {
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      validate: {
+        validator: validator.isEmail,
+        message: "Invalid email format",
+      },
+    },
   },
   {
     timestamps: true,
@@ -61,3 +77,6 @@ schema.pre("save", async function (next) {
 });
 
 export const User = mongoose.models.User || model("User", schema);
+
+export const Subscriber =
+  mongoose.models.Subscriber || model("Subscriber", subscriber);

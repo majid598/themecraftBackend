@@ -1,4 +1,4 @@
-import mongoose, { model } from "mongoose";
+import mongoose, { model, Types } from "mongoose";
 
 const schema = mongoose.Schema(
   {
@@ -30,6 +30,10 @@ const schema = mongoose.Schema(
       type: Number,
       default: 0,
     },
+    likes: [{
+      type: Types.ObjectId,
+      ref: "User",
+    }],
   },
   {
     timestamps: true,

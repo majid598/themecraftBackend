@@ -2,119 +2,201 @@ import bcrypt, { compare } from "bcrypt";
 import passport from "passport";
 import { TryCatch } from "../Middlewares/error.js";
 import { User } from "../Models/user.js";
-import { cookieOptions, sendToken, uploadFilesToCloudinary } from "../Utils/features.js";
+import {
+  cookieOptions,
+  generateTokenAndSetCookie,
+  sendToken,
+  uploadFilesToCloudinary,
+} from "../Utils/features.js";
 import ErrorHandler from "../Utils/utility.js";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
-import { v2 as cloudinary } from 'cloudinary'
+import { v2 as cloudinary } from "cloudinary";
+import { sendMail, sendVerificationEmail, sendWelcomeEmail } from "../mailtrap/emails.js";
 
-const newUser = TryCatch(async (req, res, next) => {
-  const { email, name, password } = req.body;
+const signup = TryCatch(async (req, res, next) => {
+  const { email, password, name } = req.body;
 
-  if (!email || !name || !password)
-    return next(new ErrorHandler("All Feilds Are Required", 404));
+  if (!email || !password || !name)
+    return next(new ErrorHandler("All fields are required", 400));
 
+  const userAlreadyExists = await User.findOne({ email });
+  console.log("userAlreadyExists", userAlreadyExists);
+
+  if (userAlreadyExists)
+    return next(new ErrorHandler("User already exists", 400));
+
+  const verificationToken = Math.floor(
+    100000 + Math.random() * 900000
+  ).toString();
 
   const user = await User.create({
     email,
-    name,
     password,
+    name,
+    verificationToken,
+    verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
   });
 
-  sendToken(
-    res,
-    user,
-    200,
-    `User registration successful`
-  );
-});
+  sendMail(user.email, verificationToken);
 
-const emailVerify = TryCatch(async (req, res, next) => {
-  const { token } = req.query;
-  const user = await User.findOne({ verificationToken: token });
-  if (!user) return next(new ErrorHandler("Invalid or expired token", 400));
-  user.verified = true;
-  user.verificationToken = undefined;
-  await user.save();
-  return res.status(200).json({
+  res.status(201).json({
     success: true,
-    message: "Email verified successfully. You can now log in.",
-  });
-});
-const resendEmail = TryCatch(async (req, res, next) => {
-  const { email } = req.body;
-  const user = await User.findOne({ email });
-  if (!user) return next(new ErrorHandler("User Not Found", 400));
-  if (user.verified)
-    return next(new ErrorHandler("Your Email is Already Verified!", 400));
-  const verificationToken = crypto.randomBytes(16).toString("hex");
-  user.verificationToken = verificationToken;
-
-  const verificationLink = `${process.env.CLIENT_URL}/verify-email?token=${verificationToken}`;
-
-  const transporter = nodemailer.createTransport({
-    service: "Gmail",
-    auth: {
-      user: process.env.MAIL,
-      pass: process.env.PASS,
+    message: "We have sent an otp on your email plz verify your email address",
+    user: {
+      ...user._doc,
+      password: undefined,
     },
   });
+});
 
-  const mailOptions = {
-    from: process.env.MAIL,
-    to: email,
-    subject: "Email Verification",
-    text: `Please verify your email by clicking on the following link.`,
-    html: `<!DOCTYPE html>
-<html>
-<head>
-  <style>
-  a{
-  padding:10px 20px;
-  background-color:white;
-  color:blue;
-  border-radius:6px;
-  font-weight:bold;
-  }
-  </style>
-</head>
-<body>
-  <h1>Please verify your email by clicking on the following link</h1>
-  <a href=${verificationLink}>
-  Verify Email
-  </a>
-</body>
-</html>`,
-  };
+const verifyEmail = TryCatch(async (req, res, next) => {
+  const { code } = req.body;
 
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.log("Error sending mail. Please try again.");
-    }
-    console.log("Mail sent successfully!");
+  const user = await User.findOne({
+    verificationToken: code,
+    verificationTokenExpiresAt: { $gt: Date.now() },
   });
 
+  if (!user)
+    return next(new ErrorHandler("Invalid or expired verification code", 404));
+
+  user.isVerified = true;
+  user.verificationToken = undefined;
+  user.verificationTokenExpiresAt = undefined;
   await user.save();
-  return res.status(200).json({
+
+  const token = generateTokenAndSetCookie(res, user._id);
+
+  await sendWelcomeEmail(user.email, user.name);
+
+  res.status(200).json({
     success: true,
-    message: "Verification email resent. Please check your email.",
+    message: "Email verified successfully",
+    token,
+    user: {
+      ...user._doc,
+      password: undefined,
+    },
   });
 });
 
 const login = TryCatch(async (req, res, next) => {
+  console.log("hello");
   const { email, password } = req.body;
-  if (!email || !password) return next(new ErrorHandler("All Fields Are Required", 404));
 
   const user = await User.findOne({ email }).select("+password");
+  if (!user) return next(new ErrorHandler("Invalid credentials", 400));
 
-  if (!user) return next(new ErrorHandler("Invalid Email Or Password", 404));
+  const isPasswordValid = await compare(password, user.password);
+  if (!isPasswordValid) {
+    return next(new ErrorHandler("Invalid credentials", 400));
+  }
 
-  const isMatch = await compare(password, user.password);
+  if (!user.isVerified)
+    return next(
+      new ErrorHandler(
+        "Your Email Address is not verified plz verify your email address",
+        404
+      )
+    );
 
-  if (!isMatch) return next(new ErrorHandler("Invalid Email Or Password", 404));
+  const token = generateTokenAndSetCookie(res, user._id);
 
-  sendToken(res, user, 200, `Welcome Back Mr ${user.name}`);
+  user.lastLogin = new Date();
+  await user.save();
+
+  return res.status(200).json({
+    success: true,
+    message: "Logged in successfully",
+    token,
+    user: {
+      ...user._doc,
+      password: undefined,
+    },
+  });
 });
+
+const logout = async (req, res) => {
+  return res
+    .status(200)
+    .cookie("themeCraft-token", "", { ...cookieOptions, maxAge: 0 })
+    .json({
+      success: true,
+      message: "Logged out successfully",
+    });
+};
+
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ success: false, message: "User not found" });
+    }
+
+    // Generate reset token
+    const resetToken = crypto.randomBytes(20).toString("hex");
+    const resetTokenExpiresAt = Date.now() + 1 * 60 * 60 * 1000; // 1 hour
+
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpiresAt = resetTokenExpiresAt;
+
+    await user.save();
+
+    // send email
+    await sendPasswordResetEmail(
+      user.email,
+      `${process.env.CLIENT_URL}/reset-password/${resetToken}`
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Password reset link sent to your email",
+    });
+  } catch (error) {
+    console.log("Error in forgotPassword ", error);
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+const resetPassword = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpiresAt: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid or expired reset token" });
+    }
+
+    // update password
+    const hashedPassword = await bcryptjs.hash(password, 10);
+
+    user.password = hashedPassword;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpiresAt = undefined;
+    await user.save();
+
+    await sendResetSuccessEmail(user.email);
+
+    res
+      .status(200)
+      .json({ success: true, message: "Password reset successful" });
+  } catch (error) {
+    console.log("Error in resetPassword ", error);
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
 
 const myProfile = TryCatch(async (req, res, next) => {
   const user = await User.findById(req.user);
@@ -124,22 +206,11 @@ const myProfile = TryCatch(async (req, res, next) => {
   });
 });
 
-const logout = TryCatch(async (req, res, next) => {
-  return res
-    .status(200)
-    .cookie("themeCraft-token", "", { ...cookieOptions, maxAge: 0 })
-    .json({
-      success: true,
-      message: "Logged out successfully",
-    });
-});
-
 const googleLogin = TryCatch(async (req, res, next) => {
   passport.authenticate("google", { scope: ["profile", "email"] });
 });
 
 const editProfile = TryCatch(async (req, res, next) => {
-
   const user = await User.findByIdAndUpdate(req.user, req.body);
   if (!req.user) return next(new ErrorHandler("No Account Found!", 404));
 
@@ -147,32 +218,6 @@ const editProfile = TryCatch(async (req, res, next) => {
   return res.status(200).json({
     success: true,
     message: "Account Updated",
-  });
-});
-
-const resetPassword = TryCatch(async (req, res, next) => {
-  const { email, password } = req.body;
-  const user = await User.findOne({ email });
-  if (!user) return next(new ErrorHandler("No Account Found!", 404));
-
-  user.password = bcrypt.hash(password, 10);
-
-  await user.save();
-  return res.status(200).json({
-    success: true,
-    message: "Password Reseted",
-  });
-});
-
-const getOtp = TryCatch(async (req, res, next) => {
-  const generateOtp = () => {
-    const otp = Math.floor(Math.random() * 90000) + 10000;
-    return otp;
-  };
-  const otp = generateOtp();
-  return res.status(200).json({
-    success: true,
-    message: `Your Otp is ${otp}`,
   });
 });
 
@@ -188,16 +233,16 @@ const uploadProfile = TryCatch(async (req, res, next) => {
   const result = await uploadFilesToCloudinary([image]);
   const profile = {
     url: result[0].url,
-    public_id: result[0].public_id
-  }
-  user.profile = profile
+    public_id: result[0].public_id,
+  };
+  user.profile = profile;
 
   await user.save();
   return res.status(200).json({
     success: true,
     message: "Profile Pic Updated",
   });
-})
+});
 
 const deleteAccount = TryCatch(async (req, res, next) => {
   const user = await User.findById(req.user);
@@ -216,10 +261,10 @@ export {
   login,
   logout,
   myProfile,
-  newUser,
+  signup,
   resetPassword,
-  emailVerify,
-  getOtp,
+  verifyEmail,
+  forgotPassword,
   deleteAccount,
-  resendEmail, uploadProfile
+  uploadProfile,
 };

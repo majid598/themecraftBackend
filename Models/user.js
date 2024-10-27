@@ -26,11 +26,6 @@ const schema = mongoose.Schema(
       url: String,
       public_id: String,
     },
-    verificationToken: { type: String },
-    verified: {
-      type: Boolean,
-      default: false,
-    },
     selectedLeng: {
       type: String,
       enum: ["English", "urdu"],
@@ -41,6 +36,18 @@ const schema = mongoose.Schema(
     googleId: String,
     downloads: [{ type: Types.ObjectId, ref: "Item" }],
     favorites: [{ type: Types.ObjectId, ref: "Item" }],
+    lastLogin: {
+			type: Date,
+			default: Date.now,
+		},
+		isVerified: {
+			type: Boolean,
+			default: false,
+		},
+		resetPasswordToken: String,
+		resetPasswordExpiresAt: Date,
+		verificationToken: String,
+		verificationTokenExpiresAt: Date,
   },
   {
     timestamps: true,

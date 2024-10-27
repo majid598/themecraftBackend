@@ -9,11 +9,6 @@ export const isAuthenticated = async (req, res, next) => {
 
   const decodeData = jwt.verify(token, process.env.JWT_SECRET);
 
-  // const user = await User.findById(decodeData._id);
-
-  // if (!user.verified)
-  //   return next(new ErrorHandler("Please Verify Your Email Address", 400));
-
   req.user = decodeData._id;
 
   next();

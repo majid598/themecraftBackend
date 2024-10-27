@@ -12,14 +12,27 @@ export const cookieOptions = {
 export const sendToken = (res, user, code, message) => {
   const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
 
-  return res.status(code).cookie("themeCraft-token", token, cookieOptions).json({
-    success: true,
-    user,
-    token,
-    message,
-  });
+  return res
+    .status(code)
+    .cookie("themeCraft-token", token, cookieOptions)
+    .json({
+      success: true,
+      user,
+      token,
+      message,
+    });
 };
 
+export const generateTokenAndSetCookie = (res, userId) => {
+  // Create the token with an expiry time
+  const token = jwt.sign({ _id: userId }, process.env.JWT_SECRET, {
+    expiresIn: "15d", // Token expires in 1 day
+  });
+
+  res.cookie("themeCraft-token", token, cookieOptions);
+
+  return token;
+};
 
 const getBase64 = (file) =>
   `data:${file.mimetype};base64,${file.buffer.toString("base64")}`;

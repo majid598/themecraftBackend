@@ -41,8 +41,8 @@ export const VERIFICATION_EMAIL_TEMPLATE = `
         border-bottom-left-radius: 10px;
       "
     >
-      <p>Hello,</p>
-      <p>Thank you for signing up! Your verification code is:</p>
+      <p style="color: white;">Hello,</p>
+      <p style="color: white;">Thank you for signing up! Your verification code is:</p>
       <div style="text-align: center; margin: 30px 0">
         <span
           style="
@@ -57,9 +57,9 @@ export const VERIFICATION_EMAIL_TEMPLATE = `
       <p>
         Enter this code on the verification page to complete your registration.
       </p>
-      <p>This code will expire in 15 minutes for security reasons.</p>
-      <p>If you didn't create an account with us, please ignore this email.</p>
-      <p>Best regards,<br /><a href="https://themecraft-net.vercer.app/" target="_blank">ThemeCraft</a></p>
+      <p style="color: white;">This code will expire in 15 minutes for security reasons.</p>
+      <p style="color: white;">If you didn't create an account with us, please ignore this email.</p>
+      <p style="color: white;">Best regards,<br /><a href="https://themecraft-net.vercer.app/" target="_blank">ThemeCraft</a></p>
     </div>
     <div
       style="
@@ -119,8 +119,8 @@ export const PASSWORD_RESET_SUCCESS_TEMPLATE = `
         border-bottom-left-radius: 10px;
       "
     >
-      <p>Hello,</p>
-      <p>
+      <p style="color: white;">Hello,</p>
+      <p style="color: white;">
         We're writing to confirm that your password has been successfully reset.
       </p>
       <div style="text-align: center; margin: 30px 0">
@@ -139,12 +139,12 @@ export const PASSWORD_RESET_SUCCESS_TEMPLATE = `
           ✓
         </div>
       </div>
-      <p>
+      <p style="color: white;">
         If you did not initiate this password reset, please contact our support
         team immediately.
       </p>
       <p>For security reasons, we recommend that you:</p>
-      <ul>
+      <ul style="color: white;">
         <li>Use a strong, unique password</li>
         <li>Enable two-factor authentication if available</li>
         <li>Avoid using the same password across multiple sites</li>

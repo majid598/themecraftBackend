@@ -12,19 +12,27 @@ import ErrorHandler from "../Utils/utility.js";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
 import { v2 as cloudinary } from "cloudinary";
-import { sendMail, sendVerificationEmail, sendWelcomeEmail } from "../mailtrap/emails.js";
+import { sendWelcomeEmail, sendVerificationMail } from "../Emails/emails.js";
 
 const signup = TryCatch(async (req, res, next) => {
   const { email, password, name } = req.body;
 
-  if (!email || !password || !name)
+  if (!email || !password || !name) {
     return next(new ErrorHandler("All fields are required", 400));
+  }
 
-  const userAlreadyExists = await User.findOne({ email });
-  console.log("userAlreadyExists", userAlreadyExists);
+  let userAlreadyExists = await User.findOne({ email });
 
-  if (userAlreadyExists)
-    return next(new ErrorHandler("User already exists", 400));
+  if (userAlreadyExists) {
+    if (!userAlreadyExists.isVerified) {
+      // Delete unverified user if they exist
+      await userAlreadyExists.deleteOne();
+      console.log("Deleted unverified user:", userAlreadyExists.email);
+    } else {
+      // If verified, return an error without re-creating the user
+      return next(new ErrorHandler("User already exists", 400));
+    }
+  }
 
   const verificationToken = Math.floor(
     100000 + Math.random() * 900000
@@ -38,14 +46,16 @@ const signup = TryCatch(async (req, res, next) => {
     verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
   });
 
-  sendMail(user.email, verificationToken);
+  // Send verification email
+  sendVerificationMail(user.email, verificationToken);
 
   res.status(201).json({
     success: true,
-    message: "We have sent an otp on your email plz verify your email address",
+    message:
+      "We have sent an OTP to your email. Please verify your email address.",
     user: {
       ...user._doc,
-      password: undefined,
+      password: undefined, // Remove password from the response
     },
   });
 });

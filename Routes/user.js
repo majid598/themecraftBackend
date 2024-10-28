@@ -14,6 +14,7 @@ import {
   userDownloads,
   subscribeNewsLetter,
   likeItem,
+  userFavorites,
 } from "../Controllers/user.js";
 import { isAuthenticated } from "../Middlewares/auth.js";
 import { singleAvatar } from "../Middlewares/multer.js";
@@ -49,6 +50,8 @@ router.get("/like/:id", isAuthenticated, likeItem);
 router.get("/me", isAuthenticated, myProfile);
 
 router.get("/downloads", isAuthenticated, userDownloads);
+
+router.get("/favorites", isAuthenticated, userFavorites);
 
 router.put("/upload/profile", isAuthenticated, singleAvatar, uploadProfile);
 

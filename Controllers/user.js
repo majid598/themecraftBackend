@@ -238,8 +238,16 @@ const userDownloads = TryCatch(async (req, res, next) => {
   const user = await User.findById(req.user);
   if (!req.user) return next(new ErrorHandler("No Account Found!", 404));
   const items = await Item.find({ _id: { $in: user.downloads } });
+  return res.status(200).json({
+    success: true,
+    items,
+  });
+});
+const userFavorites = TryCatch(async (req, res, next) => {
+  const user = await User.findById(req.user);
+  if (!req.user) return next(new ErrorHandler("No Account Found!", 404));
+  const items = await Item.find({ likes: req.user });
 
-  await user.save();
   return res.status(200).json({
     success: true,
     items,
@@ -341,4 +349,5 @@ export {
   userDownloads,
   verifyEmail,
   likeItem,
+  userFavorites,
 };

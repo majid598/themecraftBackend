@@ -63,21 +63,27 @@ const latestItems = TryCatch(async (req, res, next) => {
 });
 
 const allItems = TryCatch(async (req, res, next) => {
-  const { category } = req.query;
-  if (category === "all") {
-    const items = await Item.find().sort({ createdAt: -1 });
-    return res.status(200).json({
-      success: true,
-      items,
-    });
-  }
-  const items = await Item.find({ category });
+  const { category, page = 1, limit = 12 } = req.query; // default to page 1 and 20 items per page
+
+  const query = category && category !== "all" ? { category } : {}; // Filter by category if it's specified
+
+  // Convert page and limit to numbers and calculate the number of items to skip
+  const items = await Item.find(query)
+    .sort({ createdAt: -1 })
+
+  // Get the total number of items for pagination info
+  const totalItems = await Item.countDocuments(query);
+  const totalPages = Math.ceil(totalItems / limit);
 
   return res.status(200).json({
     success: true,
     items,
+    totalItems,
+    totalPages,
+    currentPage: page,
   });
 });
+
 
 const searchItems = TryCatch(async (req, res, next) => {
   const { query } = req.query;

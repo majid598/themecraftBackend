@@ -1,4 +1,4 @@
-import { v2 as cloudinary } from 'cloudinary';
+import { v2 as cloudinary } from "cloudinary";
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
@@ -40,7 +40,7 @@ app.use(
   })
 );
 
-app.use(cookieParser())
+app.use(cookieParser());
 
 app.use(express.json());
 
@@ -49,7 +49,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.enable("trust proxy");
 
-export const stripe = new Stripe(process.env.STRIPE_KEY)
+export const stripe = new Stripe(process.env.STRIPE_KEY);
 
 // connectPassport();
 
@@ -63,18 +63,16 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-
+import cookieParser from "cookie-parser";
+import contactRoute from "./Routes/contact.js";
 import itemRoute from "./Routes/Item.js";
-import subscribeRoute from "./Routes/Subscribe.js";
 import userRoute from "./Routes/user.js";
-import { connectPassport } from "./Utils/passport-setup.js";
-import cookieParser from 'cookie-parser';
 
 connectDb(process.env.MONGO_URI);
 
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/item", itemRoute);
-app.use("/api/v1/subscribe", subscribeRoute);
+app.use("/api/v1/contact", contactRoute);
 
 app.use(errorMiddleware);
 

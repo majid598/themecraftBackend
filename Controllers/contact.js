@@ -24,5 +24,13 @@ const contact = TryCatch(async (req, res, next) => {
     contact,
   });
 });
+const allContacts = TryCatch(async (req, res, next) => {
+  const contacts = await Contact.find();
 
-export { contact };
+  res.status(201).json({
+    success: true,
+    contacts,
+  });
+});
+
+export { contact, allContacts };

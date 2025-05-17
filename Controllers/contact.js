@@ -18,6 +18,8 @@ const contact = TryCatch(async (req, res, next) => {
     message,
   });
 
+  
+
   res.status(201).json({
     success: true,
     message: "Thanks for reach out us",

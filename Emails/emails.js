@@ -74,3 +74,27 @@ export const sendWelcomeEmail = (email, code) => {
   });
 };
 
+export const sendContactMail = (email, code) => {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.MAIL, // Your Gmail address
+      pass: process.env.PASS, // Your Gmail password or app-specific password
+    },
+  });
+
+  const mailOptions = {
+    from: `"ThemeCraft Alert" <${process.env.MAIL}>`, // Your Gmail address as the sender
+    to: email, // recipient's email address
+    subject: "Message Alert",
+    html: VERIFICATION_EMAIL_TEMPLATE.replace("{verificationCode}", code),
+    text: "Hi dear Majid ali you have a message on your site Themecraft",
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      return console.log("Error:", error);
+    }
+    console.log("Email sent:", info.response);
+  });
+};

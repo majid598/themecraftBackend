@@ -1,5 +1,5 @@
 import { TryCatch } from "../Middlewares/error.js";
-import { Quote } from "../Models/qoute.js";
+import { Quote } from "../Models/quote.js";
 import ErrorHandler from "../Utils/utility.js";
 import { sendQuoteEmail } from "../Emails/emails.js";
 

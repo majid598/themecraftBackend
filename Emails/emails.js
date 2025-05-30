@@ -111,7 +111,7 @@ export const sendContactEmail = async (contactData) => {
   const mailOptions = {
     from: `"ThemeCraft" <${process.env.MAIL}>`,
     to: process.env.OWNER_EMAIL,
-    subject: `New Contact Form Submission: ${subject}`,
+    subject: `You have a new contact: ${subject}`,
     html: `
       <h2>New Contact Form Submission</h2>
       <p><strong>Name:</strong> ${name}</p>
@@ -140,7 +140,7 @@ export const sendQuoteEmail = async (quoteData) => {
   const mailOptions = {
     from: `"ThemeCraft" <${process.env.MAIL}>`,
     to: process.env.OWNER_EMAIL,
-    subject: "New Quote Request",
+    subject: "You have a new Quote Request",
     html: `
       <h2>New Quote Request</h2>
       <p><strong>Name:</strong> ${name}</p>

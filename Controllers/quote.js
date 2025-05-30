@@ -1,6 +1,7 @@
 import { TryCatch } from "../Middlewares/error.js";
 import { Quote } from "../Models/qoute.js";
 import ErrorHandler from "../Utils/utility.js";
+import { sendQuoteEmail } from "../Emails/emails.js";
 
 const quote = TryCatch(async (req, res, next) => {
   const { email, name, phone, lookingFor, budget, about, companyName } =
@@ -20,9 +21,12 @@ const quote = TryCatch(async (req, res, next) => {
     about,
   });
 
+  // Send email notification
+  await sendQuoteEmail(quote);
+
   res.status(201).json({
     success: true,
-    message: "Thanks for reach out us! we'll reply soon",
+    message: "Thanks for reaching out to us! We'll reply soon",
     quote,
   });
 });

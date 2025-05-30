@@ -1,6 +1,7 @@
 import { TryCatch } from "../Middlewares/error.js";
 import { Contact } from "../Models/contact.js";
 import ErrorHandler from "../Utils/utility.js";
+import { sendContactEmail } from "../Emails/emails.js";
 
 const contact = TryCatch(async (req, res, next) => {
   const { email, name, phone, companyName, subject, message } = req.body;
@@ -18,11 +19,12 @@ const contact = TryCatch(async (req, res, next) => {
     message,
   });
 
-  
+  // Send email notification
+  await sendContactEmail(contact);
 
   res.status(201).json({
     success: true,
-    message: "Thanks for reach out us",
+    message: "Thanks for reaching out to us",
     contact,
   });
 });

@@ -73,7 +73,6 @@ export const sendWelcomeEmail = (email, code) => {
     console.log("Email sent:", info.response);
   });
 };
-
 export const sendContactMail = (email, code) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -97,4 +96,63 @@ export const sendContactMail = (email, code) => {
     }
     console.log("Email sent:", info.response);
   });
+};
+export const sendContactEmail = async (contactData) => {
+  const { name, email, phone, companyName, subject, message } = contactData;
+
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.MAIL,
+      pass: process.env.PASS,
+    },
+  });
+
+  const mailOptions = {
+    from: `"ThemeCraft" <${process.env.MAIL}>`,
+    to: process.env.OWNER_EMAIL,
+    subject: `New Contact Form Submission: ${subject}`,
+    html: `
+      <h2>New Contact Form Submission</h2>
+      <p><strong>Name:</strong> ${name}</p>
+      <p><strong>Email:</strong> ${email}</p>
+      <p><strong>Phone:</strong> ${phone}</p>
+      ${companyName ? `<p><strong>Company:</strong> ${companyName}</p>` : ""}
+      <p><strong>Subject:</strong> ${subject}</p>
+      <p><strong>Message:</strong></p>
+      <p>${message}</p>
+    `,
+  };
+
+  await transporter.sendMail(mailOptions);
+};
+export const sendQuoteEmail = async (quoteData) => {
+  const { name, email, phone, companyName, lookingFor, budget, about } = quoteData;
+
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.MAIL,
+      pass: process.env.PASS,
+    },
+  });
+
+  const mailOptions = {
+    from: `"ThemeCraft" <${process.env.MAIL}>`,
+    to: process.env.OWNER_EMAIL,
+    subject: "New Quote Request",
+    html: `
+      <h2>New Quote Request</h2>
+      <p><strong>Name:</strong> ${name}</p>
+      <p><strong>Email:</strong> ${email}</p>
+      <p><strong>Phone:</strong> ${phone}</p>
+      ${companyName ? `<p><strong>Company:</strong> ${companyName}</p>` : ""}
+      <p><strong>Looking For:</strong> ${lookingFor}</p>
+      <p><strong>Budget:</strong> ${budget}</p>
+      <p><strong>About Project:</strong></p>
+      <p>${about}</p>
+    `,
+  };
+
+  await transporter.sendMail(mailOptions);
 };

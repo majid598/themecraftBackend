@@ -30,10 +30,49 @@ const schema = mongoose.Schema(
       type: Number,
       default: 0,
     },
-    likes: [{
-      type: Types.ObjectId,
-      ref: "User",
-    }],
+    likes: [
+      {
+        type: Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    reviews: [
+      {
+        user: {
+          type: Types.ObjectId,
+          ref: "User",
+          required: true,
+        },
+        rating: {
+          type: Number,
+          default: 0,
+        },
+        comment: {
+          type: String,
+          required: true,
+        },
+        createdAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
+    comments: [
+      {
+        user: {
+          type: Types.ObjectId,
+          ref: "User",
+        },
+        comment: {
+          type: String,
+          required: true,
+        },
+        createdAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
   },
   {
     timestamps: true,

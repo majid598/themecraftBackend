@@ -68,8 +68,7 @@ const allItems = TryCatch(async (req, res, next) => {
   const query = category && category !== "all" ? { category } : {}; // Filter by category if it's specified
 
   // Convert page and limit to numbers and calculate the number of items to skip
-  const items = await Item.find(query)
-    .sort({ createdAt: -1 })
+  const items = await Item.find(query).sort({ createdAt: -1 });
 
   // Get the total number of items for pagination info
   const totalItems = await Item.countDocuments(query);
@@ -84,11 +83,17 @@ const allItems = TryCatch(async (req, res, next) => {
   });
 });
 
-
 const searchItems = TryCatch(async (req, res, next) => {
   const { query } = req.query;
 
-  const items = await Item.find({ name: new RegExp(query, "i") });
+  const items = await await Item.find({
+    $or: [
+      { name: { $regex: query, $options: "i" } },
+      { title: { $regex: query, $: "i" } },
+      { category: { $regex: query, $options: "i" } },
+      { description: { $regex: query, $options: "i" } },
+    ],
+  });
 
   return res.status(200).json({
     success: true,
@@ -161,7 +166,6 @@ const downloadItem = TryCatch(async (req, res, next) => {
     .status(200)
     .json({ success: true, message: "Template Downloaded Successfully" });
 });
-
 
 export {
   allItems,

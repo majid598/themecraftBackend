@@ -1,5 +1,6 @@
 import { TryCatch } from "../Middlewares/error.js";
 import { Item } from "../Models/Item.js";
+import { User } from "../Models/user.js";
 import ErrorHandler from "../Utils/utility.js";
 
 const postReview = TryCatch(async (req, res, next) => {
@@ -14,9 +15,15 @@ const postReview = TryCatch(async (req, res, next) => {
     return next(new ErrorHandler("Rating must be between 1 and 5", 400));
   }
 
+  // Check if user has downloaded the template
+  const user = await User.findById(req.user);
+  if (!user.downloads.includes(itemId)) {
+    return next(new ErrorHandler("You must download the template before reviewing", 400));
+  }
+
   const item = await Item.findById(itemId);
   if (!item) {
-    return next(new ErrorHandler("Item not found", 404));
+    return next(new ErrorHandler("Template not found", 404));
   }
 
   // Check if user has already reviewed

@@ -3,7 +3,8 @@ import { Item } from "../Models/Item.js";
 import ErrorHandler from "../Utils/utility.js";
 
 const postReview = TryCatch(async (req, res, next) => {
-  const { rating, comment, itemId } = req.body;
+  const { rating, comment } = req.body;
+  const itemId = req.params.itemId;
 
   if (!rating || !comment || !itemId) {
     return next(new ErrorHandler("All fields are required", 400));
@@ -24,7 +25,9 @@ const postReview = TryCatch(async (req, res, next) => {
   );
 
   if (hasReviewed) {
-    return next(new ErrorHandler("You have already reviewed this template", 400));
+    return next(
+      new ErrorHandler("You have already reviewed this template", 400)
+    );
   }
 
   item.reviews.push({

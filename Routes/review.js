@@ -4,7 +4,7 @@ import { isAuthenticated } from "../Middlewares/auth.js";
 
 const router = express.Router();
 
-router.post("/", isAuthenticated, postReview);
+router.post("/:itemId/post", isAuthenticated, postReview);
 router.get("/:itemId", getReviews);
 
 export default router;

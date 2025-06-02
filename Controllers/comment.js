@@ -14,7 +14,9 @@ const postComment = TryCatch(async (req, res, next) => {
   // Check if user has downloaded the template
   const user = await User.findById(req.user);
   if (!user.downloads.includes(itemId)) {
-    return next(new ErrorHandler("You must download the template before commenting", 400));
+    return next(
+      new ErrorHandler("You must download the template before commenting", 400)
+    );
   }
 
   const newComment = await Comment.create({
@@ -34,11 +36,14 @@ const addReply = TryCatch(async (req, res, next) => {
   const { reply } = req.body;
   const { commentId } = req.params;
 
+  console.log(reply, commentId);
+
   if (!reply) {
     return next(new ErrorHandler("Reply is required", 400));
   }
 
   const comment = await Comment.findById(commentId);
+  console.log(comment)
   if (!comment) {
     return next(new ErrorHandler("Comment not found", 404));
   }
@@ -46,7 +51,9 @@ const addReply = TryCatch(async (req, res, next) => {
   // Check if user has downloaded the template
   const user = await User.findById(req.user);
   if (!user.downloads.includes(comment.item)) {
-    return next(new ErrorHandler("You must download the template before replying", 400));
+    return next(
+      new ErrorHandler("You must download the template before replying", 400)
+    );
   }
 
   comment.replies.push({
@@ -67,13 +74,13 @@ const addReply = TryCatch(async (req, res, next) => {
 const getComments = TryCatch(async (req, res, next) => {
   const { itemId } = req.params;
 
-  const comments = await Comment.find({ 
+  const comments = await Comment.find({
     item: itemId,
-    isApproved: true 
+    isApproved: true,
   })
-  .populate("user", "name")
-  .populate("replies.user", "name")
-  .sort({ createdAt: -1 });
+    .populate("user", "name profile")
+    .populate("replies.user", "name profile")
+    .sort({ createdAt: -1 });
 
   res.status(200).json({
     success: true,
@@ -134,11 +141,11 @@ const approveReply = TryCatch(async (req, res, next) => {
   });
 });
 
-export { 
-  postComment, 
-  getComments, 
-  getAllComments, 
+export {
+  postComment,
+  getComments,
+  getAllComments,
   approveComment,
   addReply,
-  approveReply
-}; 
+  approveReply,
+};

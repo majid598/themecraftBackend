@@ -12,6 +12,7 @@ const quote = TryCatch(async (req, res, next) => {
   }
 
   const quote = await Quote.create({
+    user: req.user,
     name,
     phone,
     email,
@@ -28,6 +29,15 @@ const quote = TryCatch(async (req, res, next) => {
     success: true,
     message: "Thanks for reaching out to us! We'll reply soon",
     quote,
+  });
+});
+
+const myQuotes = TryCatch(async (req, res, next) => {
+  const quotes = Quote.find({ user: req.user });
+
+  res.status(201).json({
+    success: true,
+    quotes,
   });
 });
 

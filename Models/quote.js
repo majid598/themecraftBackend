@@ -1,7 +1,12 @@
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 
 const quoteSchema = new mongoose.Schema(
   {
+    user: {
+      type: Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     name: {
       type: String,
       required: true,
@@ -9,7 +14,7 @@ const quoteSchema = new mongoose.Schema(
     email: {
       type: String,
       required: true,
-      unique: false
+      unique: false,
     },
     phone: {
       type: String,
@@ -34,4 +39,4 @@ const quoteSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export const Quote = mongoose.model("Quote", quoteSchema); 
+export const Quote = mongoose.model("Quote", quoteSchema);

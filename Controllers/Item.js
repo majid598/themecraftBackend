@@ -86,12 +86,14 @@ const allItems = TryCatch(async (req, res, next) => {
 const searchItems = TryCatch(async (req, res, next) => {
   const { query } = req.query;
 
-  const items = await await Item.find({
+  const items = await Item.find({
     $or: [
       { name: { $regex: query, $options: "i" } },
-      { title: { $regex: query, $: "i" } },
+      { title: { $regex: query, $options: "i" } },
+      { title2: { $regex: query, $options: "i" } },
       { category: { $regex: query, $options: "i" } },
-      { description: { $regex: query, $options: "i" } },
+      { desc1: { $regex: query, $options: "i" } },
+      { desc2: { $regex: query, $options: "i" } },
     ],
   });
 

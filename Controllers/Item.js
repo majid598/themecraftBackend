@@ -2,6 +2,7 @@ import { TryCatch } from "../Middlewares/error.js";
 import { Item } from "../Models/Item.js";
 import { User } from "../Models/user.js";
 import ErrorHandler from "../Utils/utility.js";
+import { sendNewItemNotification } from "../Emails/emails.js";
 
 const newItem = TryCatch(async (req, res, next) => {
   const user = await User.findById(req.user);
@@ -37,6 +38,9 @@ const newItem = TryCatch(async (req, res, next) => {
     domain,
     category,
   });
+
+  // Send notification to subscribed users
+  await sendNewItemNotification(item);
 
   return res.status(200).json({
     success: true,

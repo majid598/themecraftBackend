@@ -322,3 +322,89 @@ export const PASSWORD_RESET_REQUEST_TEMPLATE = `
   </body>
 </html>
 `;
+
+export const NEW_ITEM_TEMPLATE = `
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>New Template Available!</title>
+  </head>
+  <body
+    style="
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: white;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #0b2447;
+    "
+  >
+    <div
+      style="
+        background: linear-gradient(to right, #4caf50, #45a049);
+        padding: 20px;
+        text-align: center;
+        border: 2px solid white;
+        border-top-right-radius: 10px;
+        border-top-left-radius: 10px;
+        border-bottom: none;
+      "
+    >
+      <h1 style="color: white; margin: 0">New Template Available!</h1>
+    </div>
+    <div
+      style="
+        background-color: rgb(255 255 255 / 0.3);
+        padding: 20px;
+        border-radius: 0 0 10px 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        border: 2px solid white;
+        border-bottom-right-radius: 10px;
+        border-bottom-left-radius: 10px;
+      "
+    >
+      <p style="color: white;">Hello,</p>
+      <p style="color: white;">We're excited to announce a new template has been added to ThemeCraft!</p>
+      
+      <div style="background-color: white; padding: 15px; border-radius: 8px; margin: 20px 0;">
+        <img src="{image}" alt="{title}" style="width: 100%; border-radius: 8px; margin-bottom: 15px;" />
+        <h2 style="color: #0b2447; margin: 0 0 10px 0;">{title}</h2>
+        <p style="color: #666; margin: 0;">{desc1}</p>
+      </div>
+
+      <p style="color: white;">Check it out now and be the first to use this amazing template!</p>
+      
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="https://themecraft-net.vercel.app/explore/template/{name}-{title}/{id}" 
+           style="
+             background-color: #4caf50;
+             color: white;
+             padding: 12px 25px;
+             text-decoration: none;
+             border-radius: 5px;
+             display: inline-block;
+             font-weight: bold;
+           "
+        >
+          View Template
+        </a>
+      </div>
+
+      <p style="color: white;">Best regards,<br /><a href="https://themecraft-net.vercel.app/" target="_blank" style="color: #4caf50; text-decoration: none;">ThemeCraft</a></p>
+    </div>
+    <div
+      style="
+        text-align: center;
+        margin-top: 20px;
+        color: #888;
+        font-size: 0.8em;
+      "
+    >
+      <p>This is an automated message, please do not reply to this email.</p>
+    </div>
+  </body>
+</html>
+`;

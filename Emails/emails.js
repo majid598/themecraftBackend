@@ -1,5 +1,10 @@
 import nodemailer from "nodemailer";
-import { NEWSLETTER_SUBSCRIPTION_TEMPLATE, VERIFICATION_EMAIL_TEMPLATE } from "./emailTemplates.js";
+import {
+  NEWSLETTER_SUBSCRIPTION_TEMPLATE,
+  VERIFICATION_EMAIL_TEMPLATE,
+  NEW_ITEM_TEMPLATE,
+} from "./emailTemplates.js";
+import { Subscriber, User } from "../Models/user.js";
 
 export const sendVerificationMail = (email, code) => {
   const transporter = nodemailer.createTransport({
@@ -127,7 +132,8 @@ export const sendContactEmail = async (contactData) => {
   await transporter.sendMail(mailOptions);
 };
 export const sendQuoteEmail = async (quoteData) => {
-  const { name, email, phone, companyName, lookingFor, budget, about } = quoteData;
+  const { name, email, phone, companyName, lookingFor, budget, about } =
+    quoteData;
 
   const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -155,4 +161,49 @@ export const sendQuoteEmail = async (quoteData) => {
   };
 
   await transporter.sendMail(mailOptions);
+};
+export const sendNewItemNotification = async (item) => {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.MAIL,
+      pass: process.env.PASS,
+    },
+  });
+
+  // Get all subscribed users
+  const subscribers = await Subscriber.find();
+  const users = await User.find();
+  const subscribedUsers = [...subscribers, ...users];
+
+  // Construct image URL
+  const imageUrl = `${process.env.CLIENT_URL}/assets/images/${item.image.id}.${item.image.imageType}`;
+
+  console.log(imageUrl)
+  // Prepare email content
+  const emailContent = NEW_ITEM_TEMPLATE
+    .replace("{image}", imageUrl)
+    .replace(/{title}/g, item.title)
+    .replace("{desc1}", item.desc1)
+    .replace("{id}", item._id)
+    .replace("{name}", item.name);
+
+    console.log(emailContent)
+
+  // Send email to each subscribed user
+  for (const user of subscribedUsers) {
+    const mailOptions = {
+      from: `"ThemeCraft" <${process.env.MAIL}>`,
+      to: user.email,
+      subject: `New Template Available: ${item.title}`,
+      html: emailContent,
+    };
+
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log(`New item notification sent to ${user.email}`);
+    } catch (error) {
+      console.error(`Failed to send email to ${user.email}:`, error);
+    }
+  }
 };

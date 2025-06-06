@@ -20,6 +20,11 @@ const quoteSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    status: {
+      type: String,
+      enum:["pending","",""],
+      default:["pending"],
+    },
     companyName: {
       type: String,
     },

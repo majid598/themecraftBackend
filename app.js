@@ -69,6 +69,7 @@ import reviewRoute from "./Routes/review.js";
 import itemRoute from "./Routes/Item.js";
 import userRoute from "./Routes/user.js";
 import commentRoute from "./Routes/comment.js";
+import quoteRoute from "./Routes/quote.js";
 
 connectDb(process.env.MONGO_URI);
 
@@ -77,6 +78,7 @@ app.use("/api/v1/item", itemRoute);
 app.use("/api/v1/contact", contactRoute);
 app.use("/api/v1/review", reviewRoute);
 app.use("/api/v1/comment", commentRoute);
+app.use("/api/v1/quote", quoteRoute);
 
 app.use(errorMiddleware);
 

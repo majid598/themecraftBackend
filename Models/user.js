@@ -40,6 +40,10 @@ const schema = mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    emailUpdates: {
+      type: Boolean,
+      default: false,
+    },
     isVerified: {
       type: Boolean,
       default: false,

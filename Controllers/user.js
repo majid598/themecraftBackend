@@ -18,7 +18,7 @@ import {
 import ErrorHandler from "../Utils/utility.js";
 
 const signup = TryCatch(async (req, res, next) => {
-  const { email, password, name } = req.body;
+  const { email, password, name, emailUpdates } = req.body;
 
   if (!email || !password || !name) {
     return next(new ErrorHandler("All fields are required", 400));
@@ -45,6 +45,7 @@ const signup = TryCatch(async (req, res, next) => {
     email,
     password,
     name,
+    emailUpdates,
     verificationToken,
     verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
   });

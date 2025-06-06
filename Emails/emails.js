@@ -173,22 +173,18 @@ export const sendNewItemNotification = async (item) => {
 
   // Get all subscribed users
   const subscribers = await Subscriber.find();
-  const users = await User.find();
+  const users = await User.find({ emailUpdates: true });
   const subscribedUsers = [...subscribers, ...users];
 
   // Construct image URL
   const imageUrl = `${process.env.CLIENT_URL}/assets/images/${item.image.id}.${item.image.imageType}`;
 
-  console.log(imageUrl)
   // Prepare email content
-  const emailContent = NEW_ITEM_TEMPLATE
-    .replace("{image}", imageUrl)
+  const emailContent = NEW_ITEM_TEMPLATE.replace("{image}", imageUrl)
     .replace(/{title}/g, item.title)
     .replace("{desc1}", item.desc1)
     .replace("{id}", item._id)
     .replace("{name}", item.name);
-
-    console.log(emailContent)
 
   // Send email to each subscribed user
   for (const user of subscribedUsers) {

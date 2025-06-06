@@ -22,8 +22,8 @@ const quoteSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum:["pending","",""],
-      default:["pending"],
+      enum: ["pending", "in-progress", "completed", "rejected"],
+      default: "pending",
     },
     companyName: {
       type: String,
@@ -39,6 +39,14 @@ const quoteSchema = new mongoose.Schema(
     about: {
       type: String,
       required: true,
+    },
+    adminResponse: {
+      type: String,
+      default: "",
+    },
+    lastUpdatedBy: {
+      type: Types.ObjectId,
+      ref: "User",
     },
   },
   { timestamps: true }
